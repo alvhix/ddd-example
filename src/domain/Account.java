@@ -1,15 +1,15 @@
 package domain;
 
+import java.util.List;
+
 public class Account {
     private final String uuid;
     private final Owner owner;
-    private final Integer balance;
-    private final Movement[] movements;
+    private final List<Movement> movements;
 
-    public Account(String uuid, Owner owner, Integer balance, Movement[] movements) {
+    public Account(String uuid, Owner owner, List<Movement> movements) {
         this.uuid = uuid;
         this.owner = owner;
-        this.balance = balance;
         this.movements = movements;
     }
 
@@ -21,11 +21,23 @@ public class Account {
         return owner;
     }
 
-    public Integer getBalance() {
-        return balance;
+    public Double getBalance() {
+        return movements.stream()
+                .mapToDouble(movement -> movement.getType() == MovementType.INCOME ? movement.getQuantity() : -movement.getQuantity())
+                .sum();
     }
 
-    public Movement[] getMovements() {
+    public List<Movement> getMovements() {
         return movements;
+    }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "uuid='" + uuid + '\'' +
+                ", owner=" + owner +
+                ", balance=" + getBalance() +
+                ", movements=" + movements +
+                '}';
     }
 }

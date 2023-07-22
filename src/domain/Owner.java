@@ -22,4 +22,13 @@ public class Owner {
     public String getNif() {
         return nif;
     }
+
+    @Override
+    public String toString() {
+        return "Owner{" +
+                "name='" + name + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", nif='" + nif + '\'' +
+                '}';
+    }
 }

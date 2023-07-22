@@ -13,6 +13,10 @@ public class Account {
         this.movements = movements;
     }
 
+    public void addMovement(Double quantity, MovementType type) {
+        this.movements.add(new Movement(quantity, type));
+    }
+
     public String getUuid() {
         return uuid;
     }

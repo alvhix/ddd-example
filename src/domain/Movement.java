@@ -7,7 +7,6 @@ public class Movement {
     public Movement(Double quantity, MovementType type) {
         this.quantity = quantity;
         this.type = type;
-
     }
 
     public Double getQuantity() {

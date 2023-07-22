@@ -16,7 +16,7 @@ public final class CliController {
         this.transferenceService = transferenceService;
     }
 
-    public List<Account> all() {
+    public List<Account> getAllAccounts() {
         return this.accountSearcher.getAllAccounts();
     }
 

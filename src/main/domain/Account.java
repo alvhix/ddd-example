@@ -33,11 +33,11 @@ public class Account {
 
     @Override
     public String toString() {
-        return "\nAccount{" +
+        return "Account{" +
                 "uuid='" + uuid + '\'' +
                 ", owner=" + owner +
                 ", balance=" + getBalance() +
                 ", movements=" + movements +
-                "}\n";
+                "}";
     }
 }

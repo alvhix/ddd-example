@@ -1,4 +1,4 @@
-package domain;
+package main.domain;
 
 import java.util.List;
 
@@ -21,10 +21,6 @@ public class Account {
         return uuid;
     }
 
-    public Owner getOwner() {
-        return owner;
-    }
-
     public Double getBalance() {
         return movements.stream()
                 .mapToDouble(movement -> movement.getType() == MovementType.INCOME ? movement.getQuantity() : -movement.getQuantity())
@@ -37,11 +33,11 @@ public class Account {
 
     @Override
     public String toString() {
-        return "Account{" +
+        return "\nAccount{" +
                 "uuid='" + uuid + '\'' +
                 ", owner=" + owner +
                 ", balance=" + getBalance() +
                 ", movements=" + movements +
-                '}';
+                "}\n";
     }
 }

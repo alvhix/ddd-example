@@ -1,9 +1,9 @@
-package infrastructure.controller;
+package main.infrastructure.controller;
 
-import application.AccountSearcher;
-import application.TransferenceService;
-import domain.Account;
-import domain.Movement;
+import main.application.AccountSearcher;
+import main.application.TransferenceService;
+import main.domain.Account;
+import main.domain.Movement;
 
 import java.util.List;
 
@@ -26,5 +26,13 @@ public final class CliController {
 
     public void transfer(String origin, String destination, Double quantity) {
         this.transferenceService.transfer(origin, destination, quantity);
+    }
+
+    public Double deposit(String account, Double quantity) {
+        return this.transferenceService.deposit(account, quantity);
+    }
+
+    public Double withdraw(String account, Double quantity) {
+        return this.transferenceService.withdraw(account, quantity);
     }
 }

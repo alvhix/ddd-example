@@ -1,4 +1,4 @@
-package domain;
+package main.domain;
 
 public class Owner {
     private final String name;
@@ -9,18 +9,6 @@ public class Owner {
         this.name = name;
         this.firstName = firstName;
         this.nif = nif;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getNif() {
-        return nif;
     }
 
     @Override

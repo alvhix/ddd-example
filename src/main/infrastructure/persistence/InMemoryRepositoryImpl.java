@@ -1,9 +1,9 @@
-package infrastructure.persistence;
+package main.infrastructure.persistence;
 
-import domain.Account;
-import domain.AccountRepository;
-import domain.Movement;
-import domain.MovementType;
+import main.domain.Account;
+import main.domain.AccountRepository;
+import main.domain.Movement;
+import main.domain.MovementType;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,8 +16,7 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
         this.accounts = accounts;
     }
 
-    @Override
-    public List<Account> all() {
+    public List<Account> getAllAccounts() {
         return this.accounts;
     }
 
@@ -42,5 +41,33 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
             originAccount.get().addMovement(quantity, MovementType.EXPENSE);
             destinationAccount.get().addMovement(quantity, MovementType.INCOME);
         }
+    }
+
+    @Override
+    public Double deposit(String account, Double quantity) {
+        Double balance = null;
+        Optional<Account> originAccount = this.accounts.stream()
+                .filter(acc -> acc.getUuid()
+                        .equals(account)).findFirst();
+        if (originAccount.isPresent()) {
+            originAccount.get().addMovement(quantity, MovementType.INCOME);
+            balance = originAccount.get().getBalance();
+        }
+
+        return balance;
+    }
+
+    @Override
+    public Double withdraw(String account, Double quantity) {
+        Double balance = null;
+        Optional<Account> originAccount = this.accounts.stream()
+                .filter(acc -> acc.getUuid()
+                        .equals(account)).findFirst();
+        if (originAccount.isPresent()) {
+            originAccount.get().addMovement(quantity, MovementType.EXPENSE);
+            balance = originAccount.get().getBalance();
+        }
+
+        return balance;
     }
 }

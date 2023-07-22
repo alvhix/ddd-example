@@ -1,4 +1,4 @@
-package domain;
+package main.domain;
 
 public class Movement {
     private final Double quantity;

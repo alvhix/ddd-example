@@ -1,8 +1,8 @@
-package application;
+package main.application;
 
-import domain.Account;
-import domain.AccountRepository;
-import domain.Movement;
+import main.domain.Account;
+import main.domain.AccountRepository;
+import main.domain.Movement;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public final class AccountSearcher {
     }
 
     public List<Account> getAllAccounts() {
-        return this.accountRepository.all();
+        return this.accountRepository.getAllAccounts();
     }
 
     public List<Movement> getAllMovements(String uuid) {

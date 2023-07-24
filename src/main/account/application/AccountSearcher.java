@@ -1,8 +1,8 @@
-package main.application;
+package main.account.application;
 
-import main.domain.Account;
-import main.domain.AccountRepository;
-import main.domain.Movement;
+import main.account.domain.Account;
+import main.account.domain.AccountRepository;
+import main.account.domain.Movement;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package main.domain;
+package main.account.domain;
 
 public class Owner {
     private final String name;
@@ -9,14 +9,5 @@ public class Owner {
         this.name = name;
         this.firstName = firstName;
         this.nif = nif;
-    }
-
-    @Override
-    public String toString() {
-        return "Owner{" +
-                "name='" + name + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", nif='" + nif + '\'' +
-                '}';
     }
 }

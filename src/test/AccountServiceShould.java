@@ -1,12 +1,12 @@
 package test;
 
-import main.application.AccountSearcher;
-import main.application.TransferenceService;
-import main.domain.Account;
-import main.domain.Movement;
-import main.domain.MovementType;
-import main.domain.Owner;
-import main.infrastructure.persistence.InMemoryRepositoryImpl;
+import main.account.application.AccountSearcher;
+import main.account.application.TransferenceService;
+import main.account.domain.Account;
+import main.account.domain.Movement;
+import main.account.domain.MovementType;
+import main.account.domain.Owner;
+import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

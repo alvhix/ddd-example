@@ -1,9 +1,9 @@
-package main.infrastructure.persistence;
+package main.account.infrastructure.persistence;
 
-import main.domain.Account;
-import main.domain.AccountRepository;
-import main.domain.Movement;
-import main.domain.MovementType;
+import main.account.domain.Account;
+import main.account.domain.AccountRepository;
+import main.account.domain.Movement;
+import main.account.domain.MovementType;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +29,7 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public void transfer(String origin, String destination, Double quantity) {
+    public void transfer(String origin, String destination, Double amount) {
         Optional<Account> originAccount = this.accounts.stream()
                 .filter(account -> account.getUuid()
                         .equals(origin)).findFirst();
@@ -38,19 +38,19 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
                         .equals(destination)).findFirst();
 
         if (originAccount.isPresent() && destinationAccount.isPresent()) {
-            originAccount.get().addMovement(quantity, MovementType.EXPENSE);
-            destinationAccount.get().addMovement(quantity, MovementType.INCOME);
+            originAccount.get().addMovement(amount, MovementType.EXPENSE);
+            destinationAccount.get().addMovement(amount, MovementType.INCOME);
         }
     }
 
     @Override
-    public Double deposit(String account, Double quantity) {
+    public Double deposit(String account, Double amount) {
         Double balance = null;
         Optional<Account> originAccount = this.accounts.stream()
                 .filter(acc -> acc.getUuid()
                         .equals(account)).findFirst();
         if (originAccount.isPresent()) {
-            originAccount.get().addMovement(quantity, MovementType.INCOME);
+            originAccount.get().addMovement(amount, MovementType.INCOME);
             balance = originAccount.get().getBalance();
         }
 
@@ -58,13 +58,13 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public Double withdraw(String account, Double quantity) {
+    public Double withdraw(String account, Double amount) {
         Double balance = null;
         Optional<Account> originAccount = this.accounts.stream()
                 .filter(acc -> acc.getUuid()
                         .equals(account)).findFirst();
         if (originAccount.isPresent()) {
-            originAccount.get().addMovement(quantity, MovementType.EXPENSE);
+            originAccount.get().addMovement(amount, MovementType.EXPENSE);
             balance = originAccount.get().getBalance();
         }
 

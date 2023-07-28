@@ -27,7 +27,7 @@ public final class HttpController {
         return result;
     }
 
-    public static String getRequestBody(HttpExchange httpExchange) throws IOException {
+    public static String getRequestBody(HttpExchange httpExchange) {
         try (InputStreamReader isr = new InputStreamReader(httpExchange.getRequestBody(), StandardCharsets.UTF_8);
              BufferedReader br = new BufferedReader(isr)) {
             StringBuilder requestBody = new StringBuilder();
@@ -36,13 +36,20 @@ public final class HttpController {
                 requestBody.append(line);
             }
             return requestBody.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public static void sendResponse(HttpExchange httpExchange, String response) throws IOException {
-        httpExchange.sendResponseHeaders(200, response.length());
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+    public static void sendResponse(HttpExchange httpExchange, String response, Integer statusCode) {
+        try {
+            httpExchange.getResponseHeaders().set("Content-Type", "application/json");
+            httpExchange.sendResponseHeaders(statusCode, response.length());
+            OutputStream os = httpExchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

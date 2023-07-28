@@ -1,16 +1,16 @@
 package main.account.application;
 
-import main.account.domain.Account;
-import main.account.domain.AccountRepository;
-import main.account.domain.Movement;
+import main.account.domain.*;
 
 import java.util.List;
 
 public final class AccountSearcher {
     private final AccountRepository accountRepository;
+    private final AccountFinder accountFinder;
 
     public AccountSearcher(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
+        this.accountFinder = new AccountFinder(accountRepository);
     }
 
     public List<Account> getAllAccounts() {
@@ -19,5 +19,9 @@ public final class AccountSearcher {
 
     public List<Movement> getAllMovements(String uuid) {
         return this.accountRepository.getAllMovements(uuid);
+    }
+
+    public Account getAccount(String uuid) throws AccountNotFound {
+        return this.accountFinder.find(uuid);
     }
 }

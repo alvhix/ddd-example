@@ -1,11 +1,8 @@
 package test;
 
 import main.account.application.AccountSearcher;
-import main.account.application.TransferenceService;
-import main.account.domain.Account;
-import main.account.domain.Movement;
-import main.account.domain.MovementType;
-import main.account.domain.Owner;
+import main.account.application.TransactionService;
+import main.account.domain.*;
 import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
 import org.junit.jupiter.api.Test;
 
@@ -21,12 +18,12 @@ public final class AccountServiceShould {
     @Test
     public void testGetAllAccounts() {
         // arrange
-        List<Account> accounts = List.of(
+        List<Account> accounts = new ArrayList<>(List.of(
                 new Account(null, null, null),
                 new Account(null, null, null),
                 new Account(null, null, null),
                 new Account(null, null, null)
-        );
+        ));
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
@@ -41,7 +38,7 @@ public final class AccountServiceShould {
     public void testGetAllMovements() {
         // arrange
         String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
-        List<Account> accounts = List.of(
+        List<Account> accounts = new ArrayList<>(List.of(
                 new Account(uuid,
                         new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
@@ -49,7 +46,7 @@ public final class AccountServiceShould {
                                 new Movement(500.00, MovementType.EXPENSE))
                         )
                 )
-        );
+        ));
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
@@ -66,7 +63,7 @@ public final class AccountServiceShould {
         // arrange
         String origin = "ff6f9c90-bbb7-409c-87d2-04277f85d111";
         String destination = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
-        List<Account> accounts = List.of(
+        List<Account> accounts = new ArrayList<>(List.of(
                 new Account(origin,
                         new Owner("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
@@ -81,24 +78,28 @@ public final class AccountServiceShould {
                                 new Movement(500.00, MovementType.EXPENSE))
                         )
                 )
-        );
+        ));
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransferenceService transferenceService = new TransferenceService(inMemoryRepository);
+        TransactionService transactionService = new TransactionService(inMemoryRepository);
 
         // act
-        transferenceService.transfer(origin, destination, 200.00);
+        try {
+            transactionService.transfer(origin, destination, 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
 
         // assert
-        assertEquals(1000.00, accounts.get(0).getBalance());
-        assertEquals(700.00, accounts.get(1).getBalance());
+        assertEquals(1000.00, accounts.get(0).calculateBalance());
+        assertEquals(700.00, accounts.get(1).calculateBalance());
     }
 
     @Test
     public void testDeposit() {
         // arrange
         String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
-        List<Account> accounts = List.of(
+        List<Account> accounts = new ArrayList<>(List.of(
                 new Account(uuid,
                         new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
@@ -106,39 +107,47 @@ public final class AccountServiceShould {
                                 new Movement(500.00, MovementType.EXPENSE))
                         )
                 )
-        );
+        ));
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransferenceService transferenceService = new TransferenceService(inMemoryRepository);
+        TransactionService transactionService = new TransactionService(inMemoryRepository);
 
         // act
-        Double balance = transferenceService.deposit(uuid, 200.00);
+        try {
+            transactionService.deposit(uuid, 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
 
         // assert
-        assertEquals(700.00, balance);
+        assertEquals(700.00, accounts.get(0).getBalance());
     }
 
     @Test
     public void testWithdraw() {
         // arrange
         String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
-        List<Account> accounts = List.of(
+        List<Account> accounts = new ArrayList<>(List.of(
                 new Account(uuid,
                         new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))
                         )
-                )
+                ))
         );
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransferenceService transferenceService = new TransferenceService(inMemoryRepository);
+        TransactionService transactionService = new TransactionService(inMemoryRepository);
 
         // act
-        Double balance = transferenceService.withdraw(uuid, 200.00);
+        try {
+            transactionService.withdraw(uuid, 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
 
         // assert
-        assertEquals(300.00, balance);
+        assertEquals(300.00, accounts.get(0).getBalance());
     }
 }

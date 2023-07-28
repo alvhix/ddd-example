@@ -1,11 +1,11 @@
 package main.account.domain;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AccountRepository {
     List<Account> getAllAccounts();
     List<Movement> getAllMovements(String uuid);
-    void transfer(String origin, String destination, Double amount);
-    Double deposit(String account, Double amount);
-    Double withdraw(String account, Double amount);
+    Optional<Account> getAccount(String uuid);
+    void update(Account account);
 }

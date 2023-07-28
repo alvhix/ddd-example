@@ -13,19 +13,27 @@ public class Account {
         this.uuid = uuid;
         this.owner = owner;
         this.movements = movements;
-        this.balance = this.getBalance();
+        this.balance = this.calculateBalance();
     }
 
     public void addMovement(Double amount, MovementType type) {
         this.movements.add(new Movement(amount, type));
-        this.balance = this.getBalance();
+        this.balance = this.calculateBalance();
     }
 
     public String getUuid() {
         return this.uuid;
     }
 
+    public Owner getOwner() {
+        return owner;
+    }
+
     public Double getBalance() {
+        return balance;
+    }
+
+    public Double calculateBalance() {
 
         return Optional.ofNullable(this.movements)
                 .stream()

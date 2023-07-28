@@ -17,7 +17,8 @@ public final class AccountSearcher {
         return this.accountRepository.getAllAccounts();
     }
 
-    public List<Movement> getAllMovements(String uuid) {
+    public List<Movement> getAllMovements(String uuid) throws AccountNotFound {
+        this.accountFinder.find(uuid);
         return this.accountRepository.getAllMovements(uuid);
     }
 

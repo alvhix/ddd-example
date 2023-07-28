@@ -84,7 +84,11 @@ public final class RestController implements HttpHandler {
             return;
         }
 
-        HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.getAllMovements(uuid)), OK);
+        try {
+            HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.getAllMovements(uuid)), OK);
+        } catch (AccountNotFound e) {
+            HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
+        }
     }
 
     private void getAccount(HttpExchange httpExchange, String uuid) {

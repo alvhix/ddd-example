@@ -52,7 +52,12 @@ public final class AccountServiceShould {
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
         // act
-        List<Movement> movements = accountSearcher.getAllMovements(uuid);
+        List<Movement> movements = null;
+        try {
+            movements = accountSearcher.getAllMovements(uuid);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
 
         // assert
         assertEquals(2, movements.size());

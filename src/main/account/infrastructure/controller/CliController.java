@@ -22,7 +22,11 @@ public final class CliController {
     }
 
     public List<Movement> getAllMovements(String uuid) {
-        return this.accountSearcher.getAllMovements(uuid);
+        try {
+            return this.accountSearcher.getAllMovements(uuid);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Account getAccount(String uuid) {

@@ -2,9 +2,7 @@ package main.account.infrastructure.persistence;
 
 import main.account.domain.Account;
 import main.account.domain.AccountRepository;
-import main.account.domain.Movement;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +15,6 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
 
     public List<Account> getAllAccounts() {
         return this.accounts;
-    }
-
-    @Override
-    public List<Movement> getAllMovements(String uuid) {
-        return this.accounts.stream().filter(acc -> acc.getUuid().equals(uuid)).findFirst().map(Account::getMovements).orElse(Collections.emptyList());
     }
 
     @Override

@@ -37,10 +37,8 @@ public final class AccountServiceShould {
     @Test
     public void testGetAllMovements() {
         // arrange
-        String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account(uuid,
-                        new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))
@@ -52,9 +50,9 @@ public final class AccountServiceShould {
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
         // act
-        List<Movement> movements = null;
+        List<Movement> movements;
         try {
-            movements = accountSearcher.getAllMovements(uuid);
+            movements = accountSearcher.getAllMovements(accounts.get(0).getUuid());
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -66,18 +64,14 @@ public final class AccountServiceShould {
     @Test
     public void testTransfer() {
         // arrange
-        String origin = "ff6f9c90-bbb7-409c-87d2-04277f85d111";
-        String destination = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account(origin,
-                        new Owner("William", "Mote", "43957942C"),
+                Account.create(new Owner("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(200.00, MovementType.INCOME))
                         )
                 ),
-                new Account(destination,
-                        new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))
@@ -90,7 +84,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            transactionService.transfer(origin, destination, 200.00);
+            transactionService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -103,10 +97,8 @@ public final class AccountServiceShould {
     @Test
     public void testDeposit() {
         // arrange
-        String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account(uuid,
-                        new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))
@@ -119,7 +111,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            transactionService.deposit(uuid, 200.00);
+            transactionService.deposit(accounts.get(0).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -131,10 +123,8 @@ public final class AccountServiceShould {
     @Test
     public void testWithdraw() {
         // arrange
-        String uuid = "249c9b83-4912-4719-9d5d-a27a3b4c4a8c";
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account(uuid,
-                        new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))
@@ -147,7 +137,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            transactionService.withdraw(uuid, 200.00);
+            transactionService.withdraw(accounts.get(0).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }

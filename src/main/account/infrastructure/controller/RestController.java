@@ -22,15 +22,13 @@ public final class RestController implements HttpHandler {
 
     public RestController() {
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account("ff6f9c90-bbb7-409c-87d2-04277f85d111",
-                        new Owner("William", "Mote", "43957942C"),
+                Account.create(new Owner("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(200.00, MovementType.INCOME))
                         )
                 ),
-                new Account("249c9b83-4912-4719-9d5d-a27a3b4c4a8c",
-                        new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 new Movement(1000.00, MovementType.INCOME),
                                 new Movement(500.00, MovementType.EXPENSE))

@@ -17,11 +17,11 @@ public final class AccountSearcher {
         return this.accountRepository.getAllAccounts();
     }
 
-    public List<Movement> getAllMovements(String uuid) throws AccountNotFound {
-        return this.accountFinder.find(uuid).getMovements();
-    }
-
     public Account getAccount(String uuid) throws AccountNotFound {
         return this.accountFinder.find(uuid);
+    }
+
+    public List<Movement> getAllMovements(String uuid) throws AccountNotFound {
+        return this.accountFinder.find(uuid).getMovements();
     }
 }

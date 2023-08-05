@@ -1,18 +1,18 @@
 package main.account.domain;
 
+import main.shared.domain.AggregateRoot;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class Account {
+public class Account extends AggregateRoot {
     private final AccountUuid uuid;
-    private final Owner owner;
     private Double balance;
     private final List<Movement> movements;
 
     public Account(AccountUuid uuid, Owner owner, List<Movement> movements) {
         this.uuid = uuid;
-        this.owner = owner;
         this.movements = movements;
         this.balance = this.calculateBalance();
     }
@@ -24,14 +24,11 @@ public class Account {
     public void addMovement(Double amount, MovementType type) {
         this.movements.add(new Movement(amount, type));
         this.balance = this.calculateBalance();
+        super.record(new MovementCreated(this.getUuid(), amount, type));
     }
 
     public String getUuid() {
         return this.uuid.value();
-    }
-
-    public Owner getOwner() {
-        return owner;
     }
 
     public Double getBalance() {

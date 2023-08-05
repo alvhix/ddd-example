@@ -1,15 +1,16 @@
-package test;
+package test.account;
 
 import main.account.application.AccountSearcher;
-import main.account.application.TransactionService;
+import main.account.application.MovementService;
 import main.account.domain.*;
 import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import test.account.infrastructure.FakeEventBus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class AccountServiceShould {
 
@@ -80,11 +81,11 @@ public final class AccountServiceShould {
         ));
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransactionService transactionService = new TransactionService(inMemoryRepository);
+        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
         try {
-            transactionService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
+            movementService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -92,6 +93,38 @@ public final class AccountServiceShould {
         // assert
         assertEquals(1000.00, accounts.get(0).calculateBalance());
         assertEquals(700.00, accounts.get(1).calculateBalance());
+    }
+
+    @Test
+    public void testTransferShouldSendEvents() {
+        // arrange
+        List<Account> accounts = new ArrayList<>(List.of(
+                Account.create(new Owner("William", "Mote", "43957942C"),
+                        new ArrayList<>(List.of(
+                                new Movement(1000.00, MovementType.INCOME),
+                                new Movement(200.00, MovementType.INCOME))
+                        )
+                ),
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                        new ArrayList<>(List.of(
+                                new Movement(1000.00, MovementType.INCOME),
+                                new Movement(500.00, MovementType.EXPENSE))
+                        )
+                )
+        ));
+        FakeEventBus fakeEventBus = new FakeEventBus();
+        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+
+        // act
+        try {
+            movementService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
+
+        // assert
+        assertEquals(2, fakeEventBus.getEvents().size());
     }
 
     @Test
@@ -107,17 +140,43 @@ public final class AccountServiceShould {
         ));
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransactionService transactionService = new TransactionService(inMemoryRepository);
+        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
         try {
-            transactionService.deposit(accounts.get(0).getUuid(), 200.00);
+            movementService.deposit(accounts.get(0).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
 
         // assert
         assertEquals(700.00, accounts.get(0).getBalance());
+    }
+
+    @Test
+    public void testDepositShouldSendEvent() {
+        // arrange
+        List<Account> accounts = new ArrayList<>(List.of(
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                        new ArrayList<>(List.of(
+                                new Movement(1000.00, MovementType.INCOME),
+                                new Movement(500.00, MovementType.EXPENSE))
+                        )
+                )
+        ));
+        FakeEventBus fakeEventBus = new FakeEventBus();
+        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+
+        // act
+        try {
+            movementService.deposit(accounts.get(0).getUuid(), 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
+
+        // assert
+        assertEquals(1, fakeEventBus.getEvents().size());
     }
 
     @Test
@@ -133,16 +192,43 @@ public final class AccountServiceShould {
         );
 
         inMemoryRepository = new InMemoryRepositoryImpl(accounts);
-        TransactionService transactionService = new TransactionService(inMemoryRepository);
+        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
         try {
-            transactionService.withdraw(accounts.get(0).getUuid(), 200.00);
+            movementService.withdraw(accounts.get(0).getUuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
 
         // assert
         assertEquals(300.00, accounts.get(0).getBalance());
+    }
+
+    @Test
+    public void testWithdrawShouldSendEvent() {
+        // arrange
+        List<Account> accounts = new ArrayList<>(List.of(
+                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                        new ArrayList<>(List.of(
+                                new Movement(1000.00, MovementType.INCOME),
+                                new Movement(500.00, MovementType.EXPENSE))
+                        )
+                ))
+        );
+
+        FakeEventBus fakeEventBus = new FakeEventBus();
+        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+
+        // act
+        try {
+            movementService.withdraw(accounts.get(0).getUuid(), 200.00);
+        } catch (AccountNotFound e) {
+            throw new RuntimeException(e);
+        }
+
+        // assert
+        assertEquals(1, fakeEventBus.getEvents().size());
     }
 }

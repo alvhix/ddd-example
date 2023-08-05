@@ -1,9 +1,9 @@
 package main.account.infrastructure.dto;
 
-public class TransactionSuccessDto {
+public class MovementSuccessDto {
     public String message;
 
-    public TransactionSuccessDto(String message) {
+    public MovementSuccessDto(String message) {
         this.message = message;
     }
 }

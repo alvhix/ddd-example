@@ -4,20 +4,23 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import main.account.application.AccountSearcher;
-import main.account.application.TransactionService;
+import main.account.application.MovementService;
 import main.account.domain.*;
-import main.account.infrastructure.dto.TransactionDto;
-import main.account.infrastructure.dto.TransactionSuccessDto;
+import main.account.infrastructure.dto.MovementDto;
+import main.account.infrastructure.dto.MovementSuccessDto;
 import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
-import main.shared.infrastructure.HttpController;
+import main.shared.infrastructure.bus.GuavaEventBus;
+import main.shared.infrastructure.http.HttpController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public final class RestController implements HttpHandler {
     private final static Integer OK = 200;
     private final static Integer NOT_FOUND = 404;
     private final AccountSearcher accountSearcher;
-    private final TransactionService transactionService;
+    private final MovementService movementService;
     private final Gson gson;
 
     public RestController() {
@@ -37,7 +40,7 @@ public final class RestController implements HttpHandler {
         ));
         AccountRepository accountRepository = new InMemoryRepositoryImpl(accounts);
         this.accountSearcher = new AccountSearcher(accountRepository);
-        this.transactionService = new TransactionService(accountRepository);
+        this.movementService = new MovementService(accountRepository, new GuavaEventBus());
         this.gson = new Gson();
     }
 
@@ -107,10 +110,10 @@ public final class RestController implements HttpHandler {
             return;
         }
 
-        TransactionDto transactionDto = this.gson.fromJson(request, TransactionDto.class);
+        MovementDto movementDto = this.gson.fromJson(request, MovementDto.class);
         try {
-            this.transactionService.deposit(transactionDto.origin, transactionDto.amount);
-            HttpController.sendResponse(httpExchange, this.gson.toJson(new TransactionSuccessDto("Deposit completed successfully")), OK);
+            this.movementService.deposit(movementDto.origin, movementDto.amount);
+            HttpController.sendResponse(httpExchange, this.gson.toJson(new MovementSuccessDto("Deposit completed successfully")), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
         }
@@ -121,10 +124,10 @@ public final class RestController implements HttpHandler {
             return;
         }
 
-        TransactionDto transactionDto = this.gson.fromJson(request, TransactionDto.class);
+        MovementDto movementDto = this.gson.fromJson(request, MovementDto.class);
         try {
-            this.transactionService.withdraw(transactionDto.origin, transactionDto.amount);
-            HttpController.sendResponse(httpExchange, this.gson.toJson(new TransactionSuccessDto("Deposit completed successfully")), OK);
+            this.movementService.withdraw(movementDto.origin, movementDto.amount);
+            HttpController.sendResponse(httpExchange, this.gson.toJson(new MovementSuccessDto("Deposit completed successfully")), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
         }
@@ -135,10 +138,10 @@ public final class RestController implements HttpHandler {
             return;
         }
 
-        TransactionDto transactionDto = this.gson.fromJson(request, TransactionDto.class);
+        MovementDto movementDto = this.gson.fromJson(request, MovementDto.class);
         try {
-            this.transactionService.transfer(transactionDto.origin, transactionDto.destination, transactionDto.amount);
-            HttpController.sendResponse(httpExchange, this.gson.toJson(new TransactionSuccessDto("Deposit completed successfully")), OK);
+            this.movementService.transfer(movementDto.origin, movementDto.destination, movementDto.amount);
+            HttpController.sendResponse(httpExchange, this.gson.toJson(new MovementSuccessDto("Deposit completed successfully")), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
         }

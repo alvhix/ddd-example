@@ -1,4 +1,4 @@
-package main.shared.infrastructure;
+package main.shared.infrastructure.http;
 
 import com.sun.net.httpserver.HttpExchange;
 

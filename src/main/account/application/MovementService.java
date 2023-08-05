@@ -1,14 +1,17 @@
 package main.account.application;
 
 import main.account.domain.*;
+import main.shared.domain.EventBus;
 
-public final class TransactionService {
+public final class MovementService {
     private final AccountRepository accountRepository;
     private final AccountFinder accountFinder;
+    private final EventBus eventBus;
 
-    public TransactionService(AccountRepository accountRepository) {
+    public MovementService(AccountRepository accountRepository, EventBus eventBus) {
         this.accountRepository = accountRepository;
         this.accountFinder = new AccountFinder(accountRepository);
+        this.eventBus = eventBus;
     }
 
     public void transfer(String origin, String destination, Double amount) throws AccountNotFound {
@@ -20,6 +23,9 @@ public final class TransactionService {
 
         this.accountRepository.update(originAccount);
         this.accountRepository.update(destinationAccount);
+
+        this.eventBus.publish(originAccount.pullDomainEvents());
+        this.eventBus.publish(destinationAccount.pullDomainEvents());
     }
 
     public void deposit(String accountUuid, Double amount) throws AccountNotFound {
@@ -28,6 +34,8 @@ public final class TransactionService {
         account.addMovement(amount, MovementType.INCOME);
 
         this.accountRepository.update(account);
+
+        this.eventBus.publish(account.pullDomainEvents());
     }
 
     public void withdraw(String accountUuid, Double amount) throws AccountNotFound {
@@ -36,5 +44,7 @@ public final class TransactionService {
         account.addMovement(amount, MovementType.EXPENSE);
 
         this.accountRepository.update(account);
+
+        this.eventBus.publish(account.pullDomainEvents());
     }
 }

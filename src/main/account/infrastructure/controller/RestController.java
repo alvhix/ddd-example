@@ -77,7 +77,7 @@ public final class RestController implements HttpHandler {
             return;
         }
 
-        HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.getAllAccounts()), OK);
+        HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.all()), OK);
     }
 
     private void getAllMovements(HttpExchange httpExchange, String uuid) {
@@ -86,7 +86,7 @@ public final class RestController implements HttpHandler {
         }
 
         try {
-            HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.getAllMovements(uuid)), OK);
+            HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.allMovements(uuid)), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
         }
@@ -98,7 +98,7 @@ public final class RestController implements HttpHandler {
         }
 
         try {
-            Account account = this.accountSearcher.getAccount(uuid);
+            Account account = this.accountSearcher.get(uuid);
             HttpController.sendResponse(httpExchange, this.gson.toJson(account), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);

@@ -1,4 +1,4 @@
-package test.account;
+package test.account.application;
 
 import main.account.application.AccountSearcher;
 import main.account.application.MovementService;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public final class AccountServiceShould {
+public final class AccountServiceTest {
 
     private InMemoryRepositoryImpl inMemoryRepository;
 
@@ -29,7 +29,7 @@ public final class AccountServiceShould {
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
         // act
-        List<Account> accountsResult = accountSearcher.getAllAccounts();
+        List<Account> accountsResult = accountSearcher.all();
 
         // assert
         assertEquals(4, accountsResult.size());
@@ -53,7 +53,7 @@ public final class AccountServiceShould {
         // act
         List<Movement> movements;
         try {
-            movements = accountSearcher.getAllMovements(accounts.get(0).getUuid());
+            movements = accountSearcher.allMovements(accounts.get(0).uuid());
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -85,7 +85,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
+            movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -118,7 +118,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.transfer(accounts.get(0).getUuid(), accounts.get(1).getUuid(), 200.00);
+            movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -144,13 +144,13 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.deposit(accounts.get(0).getUuid(), 200.00);
+            movementService.deposit(accounts.get(0).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
 
         // assert
-        assertEquals(700.00, accounts.get(0).getBalance());
+        assertEquals(700.00, accounts.get(0).balance());
     }
 
     @Test
@@ -170,7 +170,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.deposit(accounts.get(0).getUuid(), 200.00);
+            movementService.deposit(accounts.get(0).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
@@ -196,13 +196,13 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.withdraw(accounts.get(0).getUuid(), 200.00);
+            movementService.withdraw(accounts.get(0).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }
 
         // assert
-        assertEquals(300.00, accounts.get(0).getBalance());
+        assertEquals(300.00, accounts.get(0).balance());
     }
 
     @Test
@@ -223,7 +223,7 @@ public final class AccountServiceShould {
 
         // act
         try {
-            movementService.withdraw(accounts.get(0).getUuid(), 200.00);
+            movementService.withdraw(accounts.get(0).uuid(), 200.00);
         } catch (AccountNotFound e) {
             throw new RuntimeException(e);
         }

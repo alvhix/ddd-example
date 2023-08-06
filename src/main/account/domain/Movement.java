@@ -9,11 +9,11 @@ public class Movement {
         this.type = type;
     }
 
-    public Double getAmount() {
+    public Double amount() {
         return amount;
     }
 
-    public MovementType getType() {
+    public MovementType type() {
         return type;
     }
 }

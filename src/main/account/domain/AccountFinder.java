@@ -11,7 +11,7 @@ public class AccountFinder {
     }
 
     public Account find(String uuid) throws AccountNotFound {
-        Optional<Account> account = this.accountRepository.getAccount(uuid);
+        Optional<Account> account = this.accountRepository.get(uuid);
 
         if (!account.isPresent()) throw new AccountNotFound(uuid);
 

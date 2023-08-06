@@ -13,15 +13,15 @@ public final class AccountSearcher {
         this.accountFinder = new AccountFinder(accountRepository);
     }
 
-    public List<Account> getAllAccounts() {
-        return this.accountRepository.getAllAccounts();
+    public List<Account> all() {
+        return this.accountRepository.all();
     }
 
-    public Account getAccount(String uuid) throws AccountNotFound {
+    public Account get(String uuid) throws AccountNotFound {
         return this.accountFinder.find(uuid);
     }
 
-    public List<Movement> getAllMovements(String uuid) throws AccountNotFound {
-        return this.accountFinder.find(uuid).getMovements();
+    public List<Movement> allMovements(String uuid) throws AccountNotFound {
+        return this.accountFinder.find(uuid).movements();
     }
 }

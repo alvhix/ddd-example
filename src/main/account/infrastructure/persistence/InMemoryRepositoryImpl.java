@@ -13,19 +13,19 @@ public final class InMemoryRepositoryImpl implements AccountRepository {
         this.accounts = accounts;
     }
 
-    public List<Account> getAllAccounts() {
+    public List<Account> all() {
         return this.accounts;
     }
 
     @Override
-    public Optional<Account> getAccount(String uuid) {
-        return this.accounts.stream().filter(account -> account.getUuid()
+    public Optional<Account> get(String uuid) {
+        return this.accounts.stream().filter(account -> account.uuid()
                 .equals(uuid)).findFirst();
     }
 
     @Override
     public void update(Account account) {
-        getAccount(account.getUuid()).ifPresent(existingAccount -> {
+        get(account.uuid()).ifPresent(existingAccount -> {
             int index = this.accounts.indexOf(existingAccount);
             this.accounts.set(index, account);
         });

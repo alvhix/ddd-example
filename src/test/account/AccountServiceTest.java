@@ -1,9 +1,10 @@
-package test.account.application;
+package test.account;
 
 import main.account.application.AccountSearcher;
 import main.account.application.MovementService;
 import main.account.domain.*;
 import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test.account.infrastructure.FakeEventBus;
 
@@ -16,16 +17,22 @@ public final class AccountServiceTest {
 
     private InMemoryRepositoryImpl inMemoryRepository;
 
+    @BeforeEach
+    public void setup() {
+        this.inMemoryRepository = new InMemoryRepositoryImpl();
+    }
+
     @Test
     public void testGetAllAccounts() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                new Account(null, null, null),
-                new Account(null, null, null),
-                new Account(null, null, null),
-                new Account(null, null, null)
+                Account.create(Owner.create("Teodoro", "Rodríguez", "12345678H"), List.of(Movement.create(540.0, MovementType.INCOME))),
+                Account.create(Owner.create(null, null, null), List.of(Movement.create(300.0, MovementType.EXPENSE))),
+                Account.create(Owner.create(null, null, null), List.of(Movement.create(170.5, MovementType.EXPENSE))),
+                Account.create(Owner.create(null, null, null), List.of(Movement.create(42.24, MovementType.EXPENSE)))
         ));
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+
+        inMemoryRepository.save(accounts);
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
         // act
@@ -39,15 +46,15 @@ public final class AccountServiceTest {
     public void testGetAllMovements() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
 
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        inMemoryRepository.save(accounts);
         AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
 
         // act
@@ -66,21 +73,21 @@ public final class AccountServiceTest {
     public void testTransfer() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("William", "Mote", "43957942C"),
+                Account.create(Owner.create("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(200.00, MovementType.INCOME))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(200.00, MovementType.INCOME))
                         )
                 ),
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
 
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
@@ -91,29 +98,30 @@ public final class AccountServiceTest {
         }
 
         // assert
-        assertEquals(1000.00, accounts.get(0).calculateBalance());
-        assertEquals(700.00, accounts.get(1).calculateBalance());
+        assertEquals(1200.00, accounts.get(0).calculateBalance());
+        assertEquals(500.00, accounts.get(1).calculateBalance());
     }
 
     @Test
     public void testTransferShouldSendEvents() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("William", "Mote", "43957942C"),
+                Account.create(Owner.create("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(200.00, MovementType.INCOME))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(200.00, MovementType.INCOME))
                         )
                 ),
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
         FakeEventBus fakeEventBus = new FakeEventBus();
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
 
         // act
@@ -131,15 +139,15 @@ public final class AccountServiceTest {
     public void testDeposit() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
 
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
@@ -150,22 +158,23 @@ public final class AccountServiceTest {
         }
 
         // assert
-        assertEquals(700.00, accounts.get(0).balance());
+        assertEquals(700.00, inMemoryRepository.all().get(0).balance());
     }
 
     @Test
     public void testDepositShouldSendEvent() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
         FakeEventBus fakeEventBus = new FakeEventBus();
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
 
         // act
@@ -183,15 +192,15 @@ public final class AccountServiceTest {
     public void testWithdraw() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
-                ))
-        );
+                )
+        ));
 
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
 
         // act
@@ -202,23 +211,24 @@ public final class AccountServiceTest {
         }
 
         // assert
-        assertEquals(300.00, accounts.get(0).balance());
+        assertEquals(300.00, inMemoryRepository.all().get(0).balance());
     }
 
     @Test
     public void testWithdrawShouldSendEvent() {
         // arrange
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
-                ))
-        );
+                )
+        ));
 
         FakeEventBus fakeEventBus = new FakeEventBus();
-        inMemoryRepository = new InMemoryRepositoryImpl(accounts);
+
+        inMemoryRepository.save(accounts);
         MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
 
         // act

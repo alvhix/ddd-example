@@ -3,6 +3,8 @@ package main.account.application;
 import main.account.domain.*;
 import main.shared.domain.EventBus;
 
+import java.util.UUID;
+
 public final class MovementService {
     private final AccountRepository accountRepository;
     private final AccountFinder accountFinder;
@@ -14,7 +16,7 @@ public final class MovementService {
         this.eventBus = eventBus;
     }
 
-    public void transfer(String origin, String destination, Double amount) throws AccountNotFound {
+    public void transfer(UUID origin, UUID destination, Double amount) throws AccountNotFound {
         Account originAccount = this.accountFinder.find(origin);
         Account destinationAccount = this.accountFinder.find(destination);
 
@@ -28,7 +30,7 @@ public final class MovementService {
         this.eventBus.publish(destinationAccount.pullDomainEvents());
     }
 
-    public void deposit(String accountUuid, Double amount) throws AccountNotFound {
+    public void deposit(UUID accountUuid, Double amount) throws AccountNotFound {
         Account account = this.accountFinder.find(accountUuid);
 
         account.addMovement(amount, MovementType.INCOME);
@@ -38,7 +40,7 @@ public final class MovementService {
         this.eventBus.publish(account.pullDomainEvents());
     }
 
-    public void withdraw(String accountUuid, Double amount) throws AccountNotFound {
+    public void withdraw(UUID accountUuid, Double amount) throws AccountNotFound {
         Account account = this.accountFinder.find(accountUuid);
 
         account.addMovement(amount, MovementType.EXPENSE);

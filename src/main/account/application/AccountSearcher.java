@@ -3,6 +3,7 @@ package main.account.application;
 import main.account.domain.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public final class AccountSearcher {
     private final AccountRepository accountRepository;
@@ -17,11 +18,11 @@ public final class AccountSearcher {
         return this.accountRepository.all();
     }
 
-    public Account get(String uuid) throws AccountNotFound {
+    public Account get(UUID uuid) throws AccountNotFound {
         return this.accountFinder.find(uuid);
     }
 
-    public List<Movement> allMovements(String uuid) throws AccountNotFound {
+    public List<Movement> allMovements(UUID uuid) throws AccountNotFound {
         return this.accountFinder.find(uuid).movements();
     }
 }

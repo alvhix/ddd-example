@@ -1,6 +1,7 @@
 package main.account.domain;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class AccountFinder {
 
@@ -10,7 +11,7 @@ public class AccountFinder {
         this.accountRepository = accountRepository;
     }
 
-    public Account find(String uuid) throws AccountNotFound {
+    public Account find(UUID uuid) throws AccountNotFound {
         Optional<Account> account = this.accountRepository.get(uuid);
 
         if (!account.isPresent()) throw new AccountNotFound(uuid);

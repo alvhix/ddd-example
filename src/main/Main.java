@@ -1,4 +1,4 @@
-package main.account;
+package main;
 
 import com.sun.net.httpserver.HttpServer;
 import main.account.infrastructure.controller.RestController;

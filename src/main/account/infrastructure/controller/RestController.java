@@ -8,13 +8,14 @@ import main.account.application.MovementService;
 import main.account.domain.*;
 import main.account.infrastructure.dto.MovementDto;
 import main.account.infrastructure.dto.MovementSuccessDto;
-import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
+import main.account.infrastructure.persistence.MySqlRepositoryImpl;
 import main.shared.infrastructure.bus.GuavaEventBus;
 import main.shared.infrastructure.http.HttpController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class RestController implements HttpHandler {
     private final static Integer OK = 200;
@@ -25,20 +26,21 @@ public final class RestController implements HttpHandler {
 
     public RestController() {
         List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(new Owner("William", "Mote", "43957942C"),
+                Account.create(Owner.create("William", "Mote", "43957942C"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(200.00, MovementType.INCOME))
+                                Movement.create(500.0, MovementType.INCOME),
+                                Movement.create(200.0, MovementType.INCOME))
                         )
                 ),
-                Account.create(new Owner("Maria", "Garcia", "22392403V"),
+                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
-                                new Movement(1000.00, MovementType.INCOME),
-                                new Movement(500.00, MovementType.EXPENSE))
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
-        AccountRepository accountRepository = new InMemoryRepositoryImpl(accounts);
+        AccountRepository accountRepository = new MySqlRepositoryImpl();
+        accountRepository.save(accounts);
         this.accountSearcher = new AccountSearcher(accountRepository);
         this.movementService = new MovementService(accountRepository, new GuavaEventBus());
         this.gson = new Gson();
@@ -86,7 +88,7 @@ public final class RestController implements HttpHandler {
         }
 
         try {
-            HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.allMovements(uuid)), OK);
+            HttpController.sendResponse(httpExchange, this.gson.toJson(this.accountSearcher.allMovements(UUID.fromString(uuid))), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);
         }
@@ -98,7 +100,7 @@ public final class RestController implements HttpHandler {
         }
 
         try {
-            Account account = this.accountSearcher.get(uuid);
+            Account account = this.accountSearcher.get(UUID.fromString(uuid));
             HttpController.sendResponse(httpExchange, this.gson.toJson(account), OK);
         } catch (AccountNotFound e) {
             HttpController.sendResponse(httpExchange, "Account not found", NOT_FOUND);

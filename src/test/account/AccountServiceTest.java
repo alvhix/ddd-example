@@ -3,49 +3,43 @@ package test.account;
 import main.account.application.AccountSearcher;
 import main.account.application.MovementService;
 import main.account.domain.*;
-import main.account.infrastructure.persistence.InMemoryRepositoryImpl;
+import main.shared.domain.EventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import test.account.infrastructure.FakeEventBus;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 
 public final class AccountServiceTest {
+    @Mock
+    private AccountRepository accountRepository;
 
-    private InMemoryRepositoryImpl inMemoryRepository;
+    private List<Account> accounts;
+    @Mock
+    private EventBus eventBus;
+    @InjectMocks
+    private AccountSearcher accountSearcher;
+    @InjectMocks
+    private MovementService movementService;
 
     @BeforeEach
     public void setup() {
-        this.inMemoryRepository = new InMemoryRepositoryImpl();
-    }
-
-    @Test
-    public void testGetAllAccounts() {
-        // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("Teodoro", "Rodríguez", "12345678H"), List.of(Movement.create(540.0, MovementType.INCOME))),
-                Account.create(Owner.create(null, null, null), List.of(Movement.create(300.0, MovementType.EXPENSE))),
-                Account.create(Owner.create(null, null, null), List.of(Movement.create(170.5, MovementType.EXPENSE))),
-                Account.create(Owner.create(null, null, null), List.of(Movement.create(42.24, MovementType.EXPENSE)))
-        ));
-
-        inMemoryRepository.save(accounts);
-        AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
-
-        // act
-        List<Account> accountsResult = accountSearcher.all();
-
-        // assert
-        assertEquals(4, accountsResult.size());
-    }
-
-    @Test
-    public void testGetAllMovements() {
-        // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
+        MockitoAnnotations.openMocks(this); // Initialize the mocks
+        this.accounts = new ArrayList<>(List.of(
+                Account.create(Owner.create("William", "Mote", "43957942C"),
+                        new ArrayList<>(List.of(
+                                Movement.create(1000.00, MovementType.INCOME),
+                                Movement.create(200.00, MovementType.INCOME))
+                        )
+                ),
                 Account.create(Owner.create("Maria", "Garcia", "22392403V"),
                         new ArrayList<>(List.of(
                                 Movement.create(1000.00, MovementType.INCOME),
@@ -53,192 +47,147 @@ public final class AccountServiceTest {
                         )
                 )
         ));
+    }
 
-        inMemoryRepository.save(accounts);
-        AccountSearcher accountSearcher = new AccountSearcher(inMemoryRepository);
+    @Test
+    public void testGetAllAccounts() {
+        // arrange
+        when(accountRepository.all()).thenReturn(accounts);
 
         // act
-        List<Movement> movements;
-        try {
-            movements = accountSearcher.allMovements(accounts.get(0).uuid());
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        List<Account> accountsResult = accountSearcher.all();
+
+        // assert
+        assertEquals(2, accountsResult.size());
+    }
+
+    @Test
+    public void testGetAllMovements() throws AccountNotFound {
+        // arrange
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+
+        // act
+        List<Movement> movements = accountSearcher.allMovements(accounts.get(0).uuid());
 
         // assert
         assertEquals(2, movements.size());
     }
 
     @Test
-    public void testTransfer() {
+    public void testTransfer() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(200.00, MovementType.INCOME))
-                        )
-                ),
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        when(accountRepository.get(accounts.get(1).uuid())).thenReturn(Optional.of(accounts.get(1)));
 
         // act
-        try {
-            movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
 
         // assert
-        assertEquals(1200.00, accounts.get(0).calculateBalance());
-        assertEquals(500.00, accounts.get(1).calculateBalance());
+        assertEquals(200.0, accounts.get(0).lastMovement().amount());
+        assertEquals(200.0, accounts.get(1).lastMovement().amount());
+        assertEquals(MovementType.EXPENSE, accounts.get(0).lastMovement().type());
+        assertEquals(MovementType.INCOME, accounts.get(1).lastMovement().type());
     }
 
     @Test
-    public void testTransferShouldSendEvents() {
+    public void testTransferShouldUpdate() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(200.00, MovementType.INCOME))
-                        )
-                ),
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-        FakeEventBus fakeEventBus = new FakeEventBus();
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        when(accountRepository.get(accounts.get(1).uuid())).thenReturn(Optional.of(accounts.get(1)));
 
         // act
-        try {
-            movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
 
         // assert
-        assertEquals(2, fakeEventBus.getEvents().size());
+        verify(accountRepository, times(2)).update(any());
     }
 
     @Test
-    public void testDeposit() {
+    public void testTransferShouldSendEvents() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        when(accountRepository.get(accounts.get(1).uuid())).thenReturn(Optional.of(accounts.get(1)));
 
         // act
-        try {
-            movementService.deposit(accounts.get(0).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
 
         // assert
-        assertEquals(700.00, inMemoryRepository.all().get(0).balance());
+        verify(eventBus, times(2)).publish(any());
     }
 
     @Test
-    public void testDepositShouldSendEvent() {
+    public void testDeposit() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-        FakeEventBus fakeEventBus = new FakeEventBus();
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
 
         // act
-        try {
-            movementService.deposit(accounts.get(0).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.deposit(accounts.get(0).uuid(), 200.00);
 
         // assert
-        assertEquals(1, fakeEventBus.getEvents().size());
+        assertEquals(1400.0, accounts.get(0).balance());
+        assertEquals(200, accounts.get(0).lastMovement().amount());
+        assertEquals(MovementType.INCOME, accounts.get(0).lastMovement().type());
     }
 
     @Test
-    public void testWithdraw() {
+    public void testDepositShouldUpdate() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, new FakeEventBus());
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
 
         // act
-        try {
-            movementService.withdraw(accounts.get(0).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.deposit(accounts.get(0).uuid(), 200.00);
 
         // assert
-        assertEquals(300.00, inMemoryRepository.all().get(0).balance());
+        verify(accountRepository, times(1)).update(any());
     }
 
     @Test
-    public void testWithdrawShouldSendEvent() {
+    public void testDepositShouldSendEvent() throws AccountNotFound {
         // arrange
-        List<Account> accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
-
-        FakeEventBus fakeEventBus = new FakeEventBus();
-
-        inMemoryRepository.save(accounts);
-        MovementService movementService = new MovementService(inMemoryRepository, fakeEventBus);
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
 
         // act
-        try {
-            movementService.withdraw(accounts.get(0).uuid(), 200.00);
-        } catch (AccountNotFound e) {
-            throw new RuntimeException(e);
-        }
+        movementService.deposit(accounts.get(0).uuid(), 200.00);
 
         // assert
-        assertEquals(1, fakeEventBus.getEvents().size());
+        verify(eventBus, times(1)).publish(any());
+    }
+
+    @Test
+    public void testWithdraw() throws AccountNotFound {
+        // arrange
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+
+        // act
+        movementService.withdraw(accounts.get(0).uuid(), 200.00);
+
+        // assert
+        assertEquals(1000.00, accounts.get(0).balance());
+        assertEquals(200, accounts.get(0).lastMovement().amount());
+        assertEquals(MovementType.EXPENSE, accounts.get(0).lastMovement().type());
+    }
+
+    @Test
+    public void testWithdrawShouldUpdate() throws AccountNotFound {
+        // arrange
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+
+        // act
+        movementService.withdraw(accounts.get(0).uuid(), 200.00);
+
+        // assert
+        verify(accountRepository, times(1)).update(any());
+    }
+
+    @Test
+    public void testWithdrawShouldSendEvent() throws AccountNotFound {
+        // arrange
+        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+
+        // act
+        movementService.withdraw(accounts.get(0).uuid(), 200.00);
+
+        // assert
+        verify(eventBus, times(1)).publish(any());
     }
 }

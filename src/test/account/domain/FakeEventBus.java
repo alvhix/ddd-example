@@ -1,4 +1,4 @@
-package test.account.infrastructure;
+package test.account.domain;
 
 import main.shared.domain.DomainEvent;
 import main.shared.domain.EventBus;

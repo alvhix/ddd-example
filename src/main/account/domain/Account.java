@@ -29,6 +29,10 @@ public class Account extends AggregateRoot {
         super.record(new MovementCreated(this.uuid(), amount, type));
     }
 
+    public Movement lastMovement() {
+        return movements.get(movements.size() - 1);
+    }
+
     public UUID uuid() {
         return this.uuid;
     }

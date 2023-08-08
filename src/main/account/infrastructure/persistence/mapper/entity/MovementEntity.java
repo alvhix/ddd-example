@@ -1,4 +1,4 @@
-package main.account.infrastructure.persistence.vo;
+package main.account.infrastructure.persistence.mapper.entity;
 
 import jakarta.persistence.*;
 
@@ -6,19 +6,23 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "MOVEMENT")
-public class MovementVO {
+public class MovementEntity {
     @Id
     @Column(name = "uuid")
     private UUID uuid;
+
     @ManyToOne
-    @JoinColumn(name = "uuid")
-    private AccountVO account;
+    @JoinColumn(name = "account_uuid")
+    private AccountEntity account;
     @Column(name = "amount")
     private Double amount;
     @Column(name = "type")
     private String type;
 
-    public MovementVO(UUID uuid, Double amount, String type) {
+    public MovementEntity() {
+    }
+
+    public MovementEntity(UUID uuid, Double amount, String type) {
         this.uuid = uuid;
         this.amount = amount;
         this.type = type;
@@ -32,11 +36,11 @@ public class MovementVO {
         this.uuid = uuid;
     }
 
-    public AccountVO account() {
+    public AccountEntity account() {
         return account;
     }
 
-    public void setAccount(AccountVO account) {
+    public void setAccount(AccountEntity account) {
         this.account = account;
     }
 

@@ -11,5 +11,6 @@ public class MySqlConfig {
         this.sessionFactory = new Configuration()
                 .configure("main/shared/infrastructure/persistence/orm/hibernate.cfg.xml")
                 .buildSessionFactory();
+
     }
 }

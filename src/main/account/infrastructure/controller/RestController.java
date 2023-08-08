@@ -8,7 +8,7 @@ import main.account.application.MovementService;
 import main.account.domain.*;
 import main.account.infrastructure.dto.MovementDto;
 import main.account.infrastructure.dto.MovementSuccessDto;
-import main.account.infrastructure.persistence.MySqlRepositoryImpl;
+import main.account.infrastructure.persistence.MySqlAccountRepositoryImpl;
 import main.shared.infrastructure.bus.GuavaEventBus;
 import main.shared.infrastructure.http.HttpController;
 
@@ -39,7 +39,7 @@ public final class RestController implements HttpHandler {
                         )
                 )
         ));
-        AccountRepository accountRepository = new MySqlRepositoryImpl();
+        AccountRepository accountRepository = new MySqlAccountRepositoryImpl();
         accountRepository.save(accounts);
         this.accountSearcher = new AccountSearcher(accountRepository);
         this.movementService = new MovementService(accountRepository, new GuavaEventBus());

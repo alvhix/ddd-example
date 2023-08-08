@@ -1,4 +1,4 @@
-package main.account.infrastructure.persistence.vo;
+package main.account.infrastructure.persistence.mapper.entity;
 
 import jakarta.persistence.*;
 
@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "OWNER")
-public class OwnerVO {
+public class OwnerEntity {
     @Id
     @Column(name = "uuid")
     private UUID uuid;
@@ -16,11 +16,14 @@ public class OwnerVO {
     private String firstName;
     @Column(name = "nif")
     private String nif;
+    @OneToOne
+    @JoinColumn(name = "account_uuid")
+    private AccountEntity account;
 
-    @OneToOne(mappedBy = "uuid")
-    private AccountVO account;
+    public OwnerEntity() {
+    }
 
-    public OwnerVO(UUID uuid, String name, String firstName, String nif) {
+    public OwnerEntity(UUID uuid, String name, String firstName, String nif) {
         this.uuid = uuid;
         this.name = name;
         this.firstName = firstName;
@@ -59,11 +62,11 @@ public class OwnerVO {
         this.nif = nif;
     }
 
-    public AccountVO account() {
+    public AccountEntity account() {
         return account;
     }
 
-    public void setAccount(AccountVO account) {
+    public void setAccount(AccountEntity account) {
         this.account = account;
     }
 }

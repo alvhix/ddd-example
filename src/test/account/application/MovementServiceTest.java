@@ -1,6 +1,5 @@
-package test.account;
+package test.account.application;
 
-import main.account.application.AccountSearcher;
 import main.account.application.MovementService;
 import main.account.domain.*;
 import main.shared.domain.EventBus;
@@ -15,18 +14,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-
-public final class AccountServiceTest {
+public class MovementServiceTest {
     @Mock
     private AccountRepository accountRepository;
-
-    private List<Account> accounts;
     @Mock
     private EventBus eventBus;
-    @InjectMocks
-    private AccountSearcher accountSearcher;
+    private List<Account> accounts;
     @InjectMocks
     private MovementService movementService;
 
@@ -47,30 +43,6 @@ public final class AccountServiceTest {
                         )
                 )
         ));
-    }
-
-    @Test
-    public void testGetAllAccounts() {
-        // arrange
-        when(accountRepository.all()).thenReturn(accounts);
-
-        // act
-        List<Account> accountsResult = accountSearcher.all();
-
-        // assert
-        assertEquals(2, accountsResult.size());
-    }
-
-    @Test
-    public void testGetAllMovements() throws AccountNotFound {
-        // arrange
-        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
-
-        // act
-        List<Movement> movements = accountSearcher.allMovements(accounts.get(0).uuid());
-
-        // assert
-        assertEquals(2, movements.size());
     }
 
     @Test

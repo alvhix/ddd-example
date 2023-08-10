@@ -14,9 +14,9 @@
         <property name="hibernate.current_session_context_class">thread</property>
         <property name="hibernate.show_sql">true</property>
 
-        <mapping class="account.infrastructure.persistence.mapper.entity.AccountEntity"/>
-        <mapping class="account.infrastructure.persistence.mapper.entity.OwnerEntity"/>
-        <mapping class="account.infrastructure.persistence.mapper.entity.MovementEntity"/>
+        <mapping class="account.infrastructure.persistence.entity.AccountEntity"/>
+        <mapping class="account.infrastructure.persistence.entity.OwnerEntity"/>
+        <mapping class="account.infrastructure.persistence.entity.MovementEntity"/>
 
 
     </session-factory>

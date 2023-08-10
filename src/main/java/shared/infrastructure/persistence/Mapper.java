@@ -4,9 +4,9 @@ import account.domain.Account;
 import account.domain.Movement;
 import account.domain.MovementType;
 import account.domain.Owner;
-import account.infrastructure.persistence.mapper.entity.AccountEntity;
-import account.infrastructure.persistence.mapper.entity.MovementEntity;
-import account.infrastructure.persistence.mapper.entity.OwnerEntity;
+import account.infrastructure.persistence.entity.AccountEntity;
+import account.infrastructure.persistence.entity.MovementEntity;
+import account.infrastructure.persistence.entity.OwnerEntity;
 
 import java.util.List;
 import java.util.stream.Collectors;

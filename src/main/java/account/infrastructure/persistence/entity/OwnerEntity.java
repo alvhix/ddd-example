@@ -1,4 +1,4 @@
-package account.infrastructure.persistence.mapper.entity;
+package account.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 

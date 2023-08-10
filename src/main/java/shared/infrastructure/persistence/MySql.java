@@ -3,13 +3,13 @@ package shared.infrastructure.persistence;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-public class MySqlConfig {
+public class MySql {
 
     protected SessionFactory sessionFactory;
 
-    public MySqlConfig() {
+    public MySql() {
         this.sessionFactory = new Configuration()
-                .configure("main/shared/infrastructure/persistence/orm/hibernate.cfg.xml")
+                .configure("main/java/shared/infrastructure/persistence/orm/hibernate.cfg.xml")
                 .buildSessionFactory();
 
     }

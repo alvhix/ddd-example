@@ -30,17 +30,29 @@ public class MySqlAccountRepositoryTest {
 
     @Test
     public void testSaveAccount() {
-        this.accountRepository.save(accounts.get(0));
+        accountRepository.save(accounts.get(0));
+    }
+
+    @Test
+    public void testAll() {
+        // arrange
+        accountRepository.save(accounts);
+
+        // act
+        List<Account> accountList = accountRepository.all();
+
+        // assert
+        assertEquals(1, accountList.size());
     }
 
     @Test
     public void testGet() {
         // arrange
         Account account = accounts.get(0);
-        this.accountRepository.save(account);
+        accountRepository.save(account);
 
         // act
-        Optional<Account> accountOptional = this.accountRepository.get(account.uuid());
+        Optional<Account> accountOptional = accountRepository.get(account.uuid());
 
         // assert
         assertTrue(accountOptional.isPresent());
@@ -50,14 +62,14 @@ public class MySqlAccountRepositoryTest {
     public void testUpdate() {
         // arrange
         Account account = accounts.get(0);
-        this.accountRepository.save(account);
+        accountRepository.save(account);
 
         // act
         account.addMovement(400.00, MovementType.EXPENSE);
-        this.accountRepository.update(account);
+        accountRepository.update(account);
 
         // assert
-        assertTrue(this.accountRepository.get(account.uuid()).isPresent());
-        assertEquals(3, this.accountRepository.get(account.uuid()).get().movements().size());
+        assertTrue(accountRepository.get(account.uuid()).isPresent());
+        assertEquals(3, accountRepository.get(account.uuid()).get().movements().size());
     }
 }

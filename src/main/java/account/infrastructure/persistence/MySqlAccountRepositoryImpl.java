@@ -19,10 +19,11 @@ public class MySqlAccountRepositoryImpl extends MySql implements AccountReposito
     @Override
     public List<Account> all() {
         Session session = sessionFactory.openSession();
-        List<AccountEntity> accounts = session.createQuery("FROM ACCOUNT", AccountEntity.class).list();
+        List<AccountEntity> accountEntityList = session.createQuery("FROM AccountEntity", AccountEntity.class).list();
+        List<Account> accounts = accountEntityList.stream().map(Mapper::mapToDomain).collect(Collectors.toList());
         session.close();
 
-        return accounts.stream().map(Mapper::mapToDomain).collect(Collectors.toList());
+        return accounts;
     }
 
     @Override

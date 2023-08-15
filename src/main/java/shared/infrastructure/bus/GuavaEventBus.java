@@ -1,9 +1,10 @@
 package shared.infrastructure.bus;
 
 import com.google.common.eventbus.EventBus;
-import shared.application.DomainEventSubscriber;
-import shared.domain.DomainEvent;
 
+import shared.application.DomainEventSubscriber;
+
+import shared.domain.DomainEvent;
 import java.util.List;
 
 public class GuavaEventBus implements shared.domain.EventBus {

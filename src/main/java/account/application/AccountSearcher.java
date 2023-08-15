@@ -3,6 +3,7 @@ package account.application;
 import account.domain.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public final class AccountSearcher {
@@ -22,7 +23,7 @@ public final class AccountSearcher {
         return this.accountFinder.find(uuid);
     }
 
-    public List<Movement> allMovements(UUID uuid) throws AccountNotFound {
+    public Set<Movement> allMovements(UUID uuid) throws AccountNotFound {
         return this.accountFinder.find(uuid).movements();
     }
 }

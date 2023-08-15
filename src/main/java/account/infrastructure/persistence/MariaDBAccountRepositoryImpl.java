@@ -5,16 +5,27 @@ import account.domain.AccountRepository;
 import account.infrastructure.persistence.entity.AccountEntity;
 import account.infrastructure.persistence.entity.MovementEntity;
 import account.infrastructure.persistence.entity.OwnerEntity;
+
 import org.hibernate.Session;
+import org.testcontainers.containers.MariaDBContainer;
 import shared.infrastructure.persistence.Mapper;
-import shared.infrastructure.persistence.MySql;
+import shared.infrastructure.persistence.MariaDB;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class MySqlAccountRepositoryImpl extends MySql implements AccountRepository {
+public class MariaDBAccountRepositoryImpl extends MariaDB implements AccountRepository {
+
+    public MariaDBAccountRepositoryImpl() {
+        super();
+    }
+
+    public MariaDBAccountRepositoryImpl(MariaDBContainer<?> mariaDBContainer) {
+        super(mariaDBContainer);
+    }
 
     @Override
     public List<Account> all() {
@@ -48,7 +59,7 @@ public class MySqlAccountRepositoryImpl extends MySql implements AccountReposito
         OwnerEntity owner = Mapper.mapToEntity(account.owner());
         owner.setAccount(accountEntity);
 
-        List<MovementEntity> movements = Mapper.mapToEntity(account.movements());
+        Set<MovementEntity> movements = Mapper.mapToEntity(account.movements());
         movements.forEach(x -> x.setAccount(accountEntity));
 
         accountEntity.setOwner(owner);
@@ -75,7 +86,7 @@ public class MySqlAccountRepositoryImpl extends MySql implements AccountReposito
         OwnerEntity owner = Mapper.mapToEntity(account.owner());
         owner.setAccount(accountEntity);
 
-        List<MovementEntity> movements = Mapper.mapToEntity(account.movements());
+        Set<MovementEntity> movements = Mapper.mapToEntity(account.movements());
         movements.forEach(x -> x.setAccount(accountEntity));
 
         accountEntity.setOwner(owner);
@@ -83,6 +94,7 @@ public class MySqlAccountRepositoryImpl extends MySql implements AccountReposito
 
         session.merge(accountEntity);
         session.getTransaction().commit();
+
         session.close();
     }
 }

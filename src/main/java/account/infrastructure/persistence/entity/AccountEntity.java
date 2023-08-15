@@ -2,7 +2,7 @@ package account.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,7 +19,7 @@ public class AccountEntity {
     private OwnerEntity owner;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<MovementEntity> movements;
+    private Set<MovementEntity> movements;
 
     public AccountEntity() {
     }
@@ -53,11 +53,11 @@ public class AccountEntity {
         this.owner = owner;
     }
 
-    public List<MovementEntity> movements() {
+    public Set<MovementEntity> movements() {
         return movements;
     }
 
-    public void setMovements(List<MovementEntity> movements) {
+    public void setMovements(Set<MovementEntity> movements) {
         this.movements = movements;
     }
 }

@@ -1,22 +1,23 @@
 package account.application;
 
 import account.domain.*;
-import shared.domain.EventBus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import shared.domain.EventBus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class MovementServiceTest {
+@Execution(ExecutionMode.CONCURRENT)
+public final class MovementServiceTest {
     @Mock
     private AccountRepository accountRepository;
     @Mock
@@ -30,13 +31,13 @@ public class MovementServiceTest {
         MockitoAnnotations.openMocks(this); // Initialize the mocks
         this.accounts = new ArrayList<>(List.of(
                 Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(1000.00, MovementType.INCOME),
                                 Movement.create(200.00, MovementType.INCOME))
                         )
                 ),
                 Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(1000.00, MovementType.INCOME),
                                 Movement.create(500.00, MovementType.EXPENSE))
                         )
@@ -47,17 +48,19 @@ public class MovementServiceTest {
     @Test
     public void testTransfer() throws AccountNotFound {
         // arrange
-        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
-        when(accountRepository.get(accounts.get(1).uuid())).thenReturn(Optional.of(accounts.get(1)));
+        Account origin = accounts.get(0);
+        Account destination = accounts.get(1);
+        when(accountRepository.get(origin.uuid())).thenReturn(Optional.of(origin));
+        when(accountRepository.get(destination.uuid())).thenReturn(Optional.of(destination));
 
         // act
-        movementService.transfer(accounts.get(0).uuid(), accounts.get(1).uuid(), 200.00);
+        movementService.transfer(origin.uuid(), destination.uuid(), 200.00);
 
         // assert
-        assertEquals(200.0, accounts.get(0).lastMovement().amount());
-        assertEquals(200.0, accounts.get(1).lastMovement().amount());
-        assertEquals(MovementType.EXPENSE, accounts.get(0).lastMovement().type());
-        assertEquals(MovementType.INCOME, accounts.get(1).lastMovement().type());
+        assertEquals(1000.0, origin.balance());
+        assertEquals(700.0, destination.balance());
+        assertEquals(3, origin.movements().size());
+        assertEquals(3, destination.movements().size());
     }
 
     @Test
@@ -89,15 +92,15 @@ public class MovementServiceTest {
     @Test
     public void testDeposit() throws AccountNotFound {
         // arrange
-        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        Account account = accounts.get(0);
+        when(accountRepository.get(account.uuid())).thenReturn(Optional.of(account));
 
         // act
-        movementService.deposit(accounts.get(0).uuid(), 200.00);
+        movementService.deposit(account.uuid(), 200.00);
 
         // assert
-        assertEquals(1400.0, accounts.get(0).balance());
-        assertEquals(200, accounts.get(0).lastMovement().amount());
-        assertEquals(MovementType.INCOME, accounts.get(0).lastMovement().type());
+        assertEquals(1400.0, account.balance());
+        assertEquals(3, account.movements().size());
     }
 
     @Test
@@ -127,15 +130,15 @@ public class MovementServiceTest {
     @Test
     public void testWithdraw() throws AccountNotFound {
         // arrange
-        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        Account account = accounts.get(0);
+        when(accountRepository.get(account.uuid())).thenReturn(Optional.of(account));
 
         // act
-        movementService.withdraw(accounts.get(0).uuid(), 200.00);
+        movementService.withdraw(account.uuid(), 200.00);
 
         // assert
-        assertEquals(1000.00, accounts.get(0).balance());
-        assertEquals(200, accounts.get(0).lastMovement().amount());
-        assertEquals(MovementType.EXPENSE, accounts.get(0).lastMovement().type());
+        assertEquals(1000.00, account.balance());
+        assertEquals(3, account.movements().size());
     }
 
     @Test

@@ -5,17 +5,14 @@ import account.application.MovementService;
 import account.domain.*;
 import account.infrastructure.dto.MovementDto;
 import account.infrastructure.dto.MovementSuccessDto;
-import account.infrastructure.persistence.MySqlAccountRepositoryImpl;
+import account.infrastructure.persistence.MariaDBAccountRepositoryImpl;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import shared.infrastructure.bus.GuavaEventBus;
 import shared.infrastructure.http.HttpController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class RestController implements HttpHandler {
     private final static Integer OK = 200;
@@ -27,19 +24,19 @@ public final class RestController implements HttpHandler {
     public RestController() {
         List<Account> accounts = new ArrayList<>(List.of(
                 Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(500.0, MovementType.INCOME),
                                 Movement.create(200.0, MovementType.INCOME))
                         )
                 ),
                 Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(1000.00, MovementType.INCOME),
                                 Movement.create(500.00, MovementType.EXPENSE))
                         )
                 )
         ));
-        AccountRepository accountRepository = new MySqlAccountRepositoryImpl();
+        AccountRepository accountRepository = new MariaDBAccountRepositoryImpl();
         accountRepository.save(accounts);
         this.accountSearcher = new AccountSearcher(accountRepository);
         this.movementService = new MovementService(accountRepository, new GuavaEventBus());

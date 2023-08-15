@@ -1,5 +1,5 @@
-import com.sun.net.httpserver.HttpServer;
 import account.infrastructure.controller.RestController;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetAddress;

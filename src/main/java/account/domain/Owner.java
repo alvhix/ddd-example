@@ -1,5 +1,6 @@
 package account.domain;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Owner {
@@ -33,5 +34,18 @@ public class Owner {
 
     public String nif() {
         return nif;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Owner)) return false;
+        Owner owner = (Owner) o;
+        return Objects.equals(uuid, owner.uuid) && Objects.equals(name, owner.name) && Objects.equals(firstName, owner.firstName) && Objects.equals(nif, owner.nif);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid, name, firstName, nif);
     }
 }

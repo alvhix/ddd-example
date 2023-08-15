@@ -3,18 +3,19 @@ package account.application;
 import account.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 
+@Execution(ExecutionMode.SAME_THREAD)
 public final class AccountServiceTest {
     @Mock
     private AccountRepository accountRepository;
@@ -27,13 +28,13 @@ public final class AccountServiceTest {
         MockitoAnnotations.openMocks(this); // Initialize the mocks
         this.accounts = new ArrayList<>(List.of(
                 Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(1000.00, MovementType.INCOME),
                                 Movement.create(200.00, MovementType.INCOME))
                         )
                 ),
                 Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new ArrayList<>(List.of(
+                        new HashSet<>(Set.of(
                                 Movement.create(1000.00, MovementType.INCOME),
                                 Movement.create(500.00, MovementType.EXPENSE))
                         )
@@ -50,18 +51,19 @@ public final class AccountServiceTest {
         List<Account> accountsResult = accountSearcher.all();
 
         // assert
-        assertEquals(2, accountsResult.size());
+        assertEquals(accounts, accountsResult);
     }
 
     @Test
     public void testGetAllMovements() throws AccountNotFound {
         // arrange
-        when(accountRepository.get(accounts.get(0).uuid())).thenReturn(Optional.of(accounts.get(0)));
+        Account account = accounts.get(0);
+        when(accountRepository.get(account.uuid())).thenReturn(Optional.of(account));
 
         // act
-        List<Movement> movements = accountSearcher.allMovements(accounts.get(0).uuid());
+        Set<Movement> movements = accountSearcher.allMovements(account.uuid());
 
         // assert
-        assertEquals(2, movements.size());
+        assertEquals(account.movements(), movements);
     }
 }

@@ -8,7 +8,7 @@ import account.infrastructure.persistence.entity.AccountEntity;
 import account.infrastructure.persistence.entity.MovementEntity;
 import account.infrastructure.persistence.entity.OwnerEntity;
 
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Mapper {
@@ -20,11 +20,11 @@ public class Mapper {
         );
     }
 
-    public static List<Movement> mapToDomain(List<MovementEntity> movements) {
+    public static Set<Movement> mapToDomain(Set<MovementEntity> movements) {
         return movements
                 .stream()
                 .map(movement -> new Movement(movement.uuid(), movement.amount(), MovementType.valueOf(movement.type())))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public static Owner mapToDomain(OwnerEntity ownerEntity) {
@@ -44,10 +44,10 @@ public class Mapper {
         );
     }
 
-    public static List<MovementEntity> mapToEntity(List<Movement> movements) {
+    public static Set<MovementEntity> mapToEntity(Set<Movement> movements) {
         return movements.stream()
                 .map(x -> new MovementEntity(x.uuid(), x.amount(), x.type().toString()))
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
     public static OwnerEntity mapToEntity(Owner owner) {

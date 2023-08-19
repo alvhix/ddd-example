@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "OWNER")
-public class OwnerEntity {
+public final class OwnerEntity {
     @Id
     @Column(name = "uuid")
     private UUID uuid;

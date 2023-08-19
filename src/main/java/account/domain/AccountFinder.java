@@ -3,7 +3,7 @@ package account.domain;
 import java.util.Optional;
 import java.util.UUID;
 
-public class AccountFinder {
+public final class AccountFinder {
 
     private final AccountRepository accountRepository;
 

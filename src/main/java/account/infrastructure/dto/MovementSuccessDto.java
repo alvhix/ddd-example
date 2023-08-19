@@ -1,6 +1,6 @@
 package account.infrastructure.dto;
 
-public class MovementSuccessDto {
+public final class MovementSuccessDto {
     public String message;
 
     public MovementSuccessDto(String message) {

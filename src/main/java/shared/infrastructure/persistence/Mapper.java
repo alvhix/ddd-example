@@ -11,7 +11,7 @@ import account.infrastructure.persistence.entity.OwnerEntity;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Mapper {
+public final class Mapper {
     public static Account mapToDomain(AccountEntity accountEntity) {
         return new Account(
                 accountEntity.uuid(),

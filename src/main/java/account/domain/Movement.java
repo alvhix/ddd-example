@@ -3,7 +3,7 @@ package account.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Movement {
+public final class Movement {
     private final UUID uuid;
     private final Double amount;
     private final MovementType type;

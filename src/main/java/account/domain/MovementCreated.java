@@ -4,7 +4,7 @@ import shared.domain.DomainEvent;
 
 import java.util.UUID;
 
-public class MovementCreated implements DomainEvent {
+public final class MovementCreated implements DomainEvent {
     private static final String FULL_QUALIFIED_EVENT_NAME = "movement-created";
     private final UUID accountUuid;
     private final MovementType movementType;

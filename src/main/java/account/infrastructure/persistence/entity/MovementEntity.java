@@ -6,7 +6,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "MOVEMENT")
-public class MovementEntity {
+public final class MovementEntity {
     @Id
     @Column(name = "uuid")
     private UUID uuid;

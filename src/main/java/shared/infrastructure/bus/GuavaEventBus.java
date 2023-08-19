@@ -7,7 +7,7 @@ import shared.application.DomainEventSubscriber;
 import shared.domain.DomainEvent;
 import java.util.List;
 
-public class GuavaEventBus implements shared.domain.EventBus {
+public final class GuavaEventBus implements shared.domain.EventBus {
     private final EventBus eventBus;
 
     public GuavaEventBus() {

@@ -3,7 +3,7 @@ package account.domain;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Owner {
+public final class Owner {
     private final UUID uuid;
     private final String name;
     private final String firstName;

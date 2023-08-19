@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class MariaDBAccountRepositoryImpl extends MariaDB implements AccountRepository {
+public final class MariaDBAccountRepositoryImpl extends MariaDB implements AccountRepository {
 
     public MariaDBAccountRepositoryImpl() {
         super();

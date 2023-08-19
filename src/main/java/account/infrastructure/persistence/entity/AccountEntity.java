@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "ACCOUNT")
-public class AccountEntity {
+public final class AccountEntity {
     @Id
     @Column(name = "uuid")
     private UUID uuid;

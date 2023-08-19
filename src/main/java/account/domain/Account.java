@@ -4,7 +4,7 @@ import shared.domain.AggregateRoot;
 
 import java.util.*;
 
-public class Account extends AggregateRoot {
+public final class Account extends AggregateRoot {
     private final UUID uuid;
     private Double balance;
     private final Owner owner;

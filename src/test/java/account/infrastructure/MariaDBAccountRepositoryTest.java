@@ -3,6 +3,7 @@ package account.infrastructure;
 import account.domain.*;
 import account.infrastructure.persistence.MariaDBAccountRepositoryImpl;
 import jakarta.transaction.Transactional;
+import org.checkerframework.common.value.qual.IntRange;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -16,13 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Execution(ExecutionMode.SAME_THREAD)
 public class MariaDBAccountRepositoryTest {
     private AccountRepository accountRepository;
-    private final List<Account> accounts = List.of(Account.create(
-            Owner.create("Teodoro", "Vara", "12345678H"),
-            new HashSet<>(Set.of(
-                    Movement.create(1000.00, MovementType.INCOME),
-                    Movement.create(200.00, MovementType.INCOME))
-            ))
-    );
 
     private static final MariaDBContainer<?> mariadb = new MariaDBContainer<>(
             "mariadb:lts"
@@ -46,27 +40,29 @@ public class MariaDBAccountRepositoryTest {
     @Test
     @Transactional
     void testSaveAccount() {
-        accountRepository.save(accounts.get(0));
+        Account account = AccountMother.create();
+        accountRepository.save(account);
     }
 
     @Test
     @Transactional
     void testAll() {
         // arrange
-        accountRepository.save(accounts);
+        Account account = AccountMother.create();
+        accountRepository.save(account);
 
         // act
         List<Account> accountList = accountRepository.all();
 
         // assert
-        assertEquals(accounts.get(0), accountList.get(0));
+        assertEquals(account, accountList.get(0));
     }
 
     @Test
     @Transactional
     void testGet() {
         // arrange
-        Account account = accounts.get(0);
+        Account account = AccountMother.create();
         accountRepository.save(account);
 
         // act
@@ -81,8 +77,9 @@ public class MariaDBAccountRepositoryTest {
     @Transactional
     void testUpdate() {
         // arrange
-        Account account = accounts.get(0);
+        Account account = AccountMother.create();
         accountRepository.save(account);
+        Double balance = account.balance();
 
         // act
         account.addMovement(400.00, MovementType.EXPENSE);
@@ -90,6 +87,6 @@ public class MariaDBAccountRepositoryTest {
 
         // assert
         assertTrue(accountRepository.get(account.uuid()).isPresent());
-        assertEquals(3, accountRepository.get(account.uuid()).get().movements().size());
+        assertEquals(balance - 400.0, accountRepository.get(account.uuid()).get().balance());
     }
 }

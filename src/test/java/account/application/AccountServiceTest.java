@@ -10,41 +10,31 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 
-@Execution(ExecutionMode.SAME_THREAD)
+@Execution(ExecutionMode.CONCURRENT)
 public final class AccountServiceTest {
     @Mock
     private AccountRepository accountRepository;
-    private List<Account> accounts;
     @InjectMocks
     private AccountSearcher accountSearcher;
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this); // Initialize the mocks
-        this.accounts = new ArrayList<>(List.of(
-                Account.create(Owner.create("William", "Mote", "43957942C"),
-                        new HashSet<>(Set.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(200.00, MovementType.INCOME))
-                        )
-                ),
-                Account.create(Owner.create("Maria", "Garcia", "22392403V"),
-                        new HashSet<>(Set.of(
-                                Movement.create(1000.00, MovementType.INCOME),
-                                Movement.create(500.00, MovementType.EXPENSE))
-                        )
-                )
-        ));
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testGetAllAccounts() {
         // arrange
+        List<Account> accounts = IntStream.range(0, 4)
+                .mapToObj(i -> AccountMother.create())
+                .collect(Collectors.toList());
         when(accountRepository.all()).thenReturn(accounts);
 
         // act
@@ -57,7 +47,7 @@ public final class AccountServiceTest {
     @Test
     public void testGetAllMovements() throws AccountNotFound {
         // arrange
-        Account account = accounts.get(0);
+        Account account = AccountMother.create();
         when(accountRepository.get(account.uuid())).thenReturn(Optional.of(account));
 
         // act

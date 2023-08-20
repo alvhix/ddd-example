@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Execution(ExecutionMode.SAME_THREAD)
+@TestMethodOrder(MethodOrderer.Random.class)
 public class MariaDBAccountRepositoryTest {
     private AccountRepository accountRepository;
 

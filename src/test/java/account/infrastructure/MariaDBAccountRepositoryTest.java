@@ -3,7 +3,6 @@ package account.infrastructure;
 import account.domain.*;
 import account.infrastructure.persistence.MariaDBAccountRepositoryImpl;
 import jakarta.transaction.Transactional;
-import org.checkerframework.common.value.qual.IntRange;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
@@ -18,9 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MariaDBAccountRepositoryTest {
     private AccountRepository accountRepository;
 
-    private static final MariaDBContainer<?> mariadb = new MariaDBContainer<>(
-            "mariadb:lts"
-    );
+    private static final MariaDBContainer<?> mariadb = new MariaDBContainer<>("mariadb:lts");
 
     @BeforeAll
     static void beforeAll() {
